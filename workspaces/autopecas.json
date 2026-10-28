@@ -1,0 +1,50 @@
+{
+  "slug": "autopecas",
+  "nome": "5ª Auto Peças",
+  "descricao": "Site de agendamento, painel dos atendentes e bot (aposentado após a migração para o WhatsApp Business).",
+  "icone": "ferramenta",
+  "cor": "#B32026",
+  "repositorio": "dev-gabriel-duarte/quintaaautopecas",
+  "branch": "main",
+  "backlog": "BACKLOG.md",
+  "historico": "historico",
+  "links": [
+    {"nome": "Site de agendamento", "url": "https://quintaaautopecas-production.up.railway.app/agendar"},
+    {"nome": "Painel dos atendentes", "url": "https://quintaaautopecas-production.up.railway.app/atendimento"},
+    {"nome": "Repositório no GitHub", "url": "https://github.com/dev-gabriel-duarte/quintaaautopecas"},
+    {"nome": "Railway", "url": "https://railway.com/dashboard"},
+    {"nome": "Supabase", "url": "https://supabase.com/dashboard/projects"}
+  ],
+  "sistemas": [
+    {"nome": "Site e painel (produção)", "tipo": "http",
+     "url": "https://quintaaautopecas-production.up.railway.app/health",
+     "painel": "https://quintaaautopecas-production.up.railway.app/agendar"},
+    {"nome": "Ambiente demo", "tipo": "http",
+     "url": "https://talented-vision-production-696b.up.railway.app/health"},
+    {"nome": "Chatwoot (Hetzner)", "tipo": "http",
+     "url": "https://168-119-166-103.sslip.io", "painel": "https://168-119-166-103.sslip.io"},
+    {"nome": "Deploys no Railway", "tipo": "railway", "projeto": null, "painel": "https://railway.com/dashboard"},
+    {"nome": "Supabase (plataforma)", "tipo": "statuspage",
+     "url": "https://status.supabase.com/api/v2/status.json", "painel": "https://status.supabase.com"},
+    {"nome": "GitHub (plataforma)", "tipo": "statuspage",
+     "url": "https://www.githubstatus.com/api/v2/status.json", "painel": "https://www.githubstatus.com"},
+    {"nome": "Anthropic / Claude (plataforma)", "tipo": "statuspage",
+     "url": "https://status.anthropic.com/api/v2/status.json", "painel": "https://status.anthropic.com"}
+  ],
+  "custos": [
+    {"item": "Railway (plano Hobby)", "valor": 5, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Inclui US$ 5 de uso por mês; acima disso cobra a diferença. Conferir na fatura do Railway."},
+    {"item": "Supabase", "valor": 0, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Plano Free = US$ 0; plano Pro = US$ 25. Conferir qual está ativo."},
+    {"item": "Upstash Redis", "valor": 0, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Plano gratuito cobre o volume atual. Conferir no painel da Upstash."},
+    {"item": "Hetzner CX23 (Chatwoot)", "valor": 4.5, "moeda": "EUR", "periodo": "mensal", "confirmado": false,
+     "obs": "Valor aproximado. Pode ser desligado depois de ~30 dias da migração para o WhatsApp Business."},
+    {"item": "Backup automático Hetzner", "valor": null, "moeda": "BRL", "periodo": "mensal", "confirmado": false,
+     "obs": "Cerca de R$ 7/mês se estiver ativado — não confirmado."},
+    {"item": "API da Anthropic (classificador)", "valor": null, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Só roda na análise de primeiras mensagens; uso muito pequeno. Conferir em console.anthropic.com."},
+    {"item": "WhatsApp (Meta)", "valor": 0, "moeda": "BRL", "periodo": "mensal", "confirmado": true,
+     "obs": "App WhatsApp Business é gratuito (a API cobrava por conversa)."}
+  ]
+}

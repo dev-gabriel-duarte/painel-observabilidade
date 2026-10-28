@@ -1,0 +1,20 @@
+{
+  "slug": "novo-projeto",
+  "nome": "Nome do projeto",
+  "descricao": "Uma frase sobre o projeto.",
+  "icone": "caixa",
+  "cor": "#4C6EF5",
+  "repositorio": "dev-gabriel-duarte/nome-do-repositorio",
+  "branch": "main",
+  "backlog": "BACKLOG.md",
+  "historico": "historico",
+  "links": [{"nome": "Site", "url": "https://exemplo.com"}],
+  "sistemas": [
+    {"nome": "Site (produção)", "tipo": "http", "url": "https://exemplo.com/health"},
+    {"nome": "Deploys no Railway", "tipo": "railway", "projeto": "id-do-projeto-no-railway"},
+    {"nome": "Supabase (plataforma)", "tipo": "statuspage", "url": "https://status.supabase.com/api/v2/status.json"}
+  ],
+  "custos": [
+    {"item": "Railway", "valor": 5, "moeda": "USD", "periodo": "mensal", "confirmado": false, "obs": ""}
+  ]
+}

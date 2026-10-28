@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Observabilidade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="/assets/painel.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2314161c'/%3E%3Cpath d='M4 13h3l2-5 3 9 2-6 2 2h4' fill='none' stroke='%2363e6be' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- Login -->
+  <main class="tela-login" id="tela-login" hidden>
+    <form class="cartao-login" id="form-login" novalidate>
+      <div class="marca"><span class="marca-icone" aria-hidden="true"></span>Observabilidade</div>
+      <h1>Entrar</h1>
+      <p class="suave">Painel pessoal de acompanhamento dos projetos.</p>
+      <label for="codigo">Seu código de acesso</label>
+      <input id="codigo" type="password" autocomplete="current-password" required>
+      <p class="erro" id="erro-login" role="alert"></p>
+      <button class="botao primario" type="submit">Entrar</button>
+    </form>
+  </main>
+
+  <!-- App -->
+  <div class="app" id="app" hidden>
+    <header class="topo">
+      <a class="marca" href="#/" aria-label="Início"><span class="marca-icone" aria-hidden="true"></span>Observabilidade</a>
+      <nav class="trilha" id="trilha" aria-label="Você está em"></nav>
+      <div class="topo-acoes">
+        <span class="atualizado suave" id="atualizado"></span>
+        <button class="botao fantasma" id="botao-atualizar" type="button">Atualizar agora</button>
+        <span class="quem" id="quem"></span>
+        <button class="botao fantasma" id="botao-sair" type="button">Sair</button>
+      </div>
+    </header>
+    <main class="conteudo" id="conteudo" aria-live="polite"></main>
+  </div>
+
+  <!-- Leitura de um registro do histórico -->
+  <div class="fundo-gaveta" id="fundo-gaveta" hidden></div>
+  <aside class="gaveta" id="gaveta" aria-hidden="true" aria-labelledby="gaveta-titulo">
+    <div class="gaveta-topo">
+      <span class="suave" id="gaveta-titulo">Registro</span>
+      <button class="botao fantasma" id="fechar-gaveta" type="button" aria-label="Fechar">Fechar</button>
+    </div>
+    <article class="markdown" id="gaveta-corpo"></article>
+  </aside>
+
+  <script type="module" src="/assets/painel.js"></script>
+</body>
+</html>

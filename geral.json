@@ -1,0 +1,10 @@
+{
+  "cotacao": {"BRL": 1, "USD": 5.40, "EUR": 6.30},
+  "cotacao_data": "28/10/2026 (aproximada — atualizar de vez em quando)",
+  "custos": [
+    {"item": "Claude (assinatura)", "valor": null, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Informar o plano: Pro = US$ 20; Max = US$ 100 ou US$ 200. Vale para todos os projetos."},
+    {"item": "GitHub", "valor": 0, "moeda": "USD", "periodo": "mensal", "confirmado": false,
+     "obs": "Plano gratuito cobre repositórios privados."}
+  ]
+}
