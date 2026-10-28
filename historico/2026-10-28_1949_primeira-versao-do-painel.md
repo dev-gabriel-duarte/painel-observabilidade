@@ -1,6 +1,6 @@
 # Primeira versão do painel de observabilidade
 
-- **Data do push:** 28/10/2026 �s 19:49 (Brasília) — primeiro envio para o GitHub
+- **Data do push:** 28/10/2026 às 19:49 (Brasília) — primeiro envio para o GitHub
 - **Branch:** `main`
 - **Publicado na produção?** Ainda não: falta criar o serviço no Railway e as variáveis.
 
