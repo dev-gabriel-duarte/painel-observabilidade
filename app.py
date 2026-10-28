@@ -116,6 +116,22 @@ def equipe() -> dict:
     return pessoas
 
 
+def problema_de_configuracao() -> str:
+    """Diz em português o que falta no Railway — sem nunca mostrar os valores."""
+    if not os.getenv('PAINEL_SEGREDO', '').strip():
+        return 'a variável PAINEL_SEGREDO não chegou ao servidor (confira o nome e clique em Deploy no Railway).'
+    bruto = os.getenv('PAINEL_EQUIPE', '').strip()
+    if not bruto:
+        return 'a variável PAINEL_EQUIPE não chegou ao servidor (confira o nome e clique em Deploy no Railway).'
+    if not equipe():
+        pares = [p for p in bruto.split(';') if p.strip()]
+        sem_dois_pontos = sum(1 for p in pares if ':' not in p)
+        if sem_dois_pontos:
+            return 'PAINEL_EQUIPE precisa do formato Nome:codigo;Nome:codigo (faltou o ":" entre o nome e o código).'
+        return 'todos os códigos do PAINEL_EQUIPE têm menos de 10 caracteres — use códigos mais longos.'
+    return ''
+
+
 def _chave() -> bytes:
     segredo = os.getenv('PAINEL_SEGREDO', '')
     return hashlib.sha256(('painel-obs:' + segredo).encode('utf-8')).digest()
@@ -168,8 +184,9 @@ class Login(BaseModel):
 
 @app.post('/api/login')
 async def login(dados: Login, request: Request, response: Response):
-    if not os.getenv('PAINEL_SEGREDO') or not equipe():
-        raise HTTPException(status_code=503, detail='Painel desativado: configure PAINEL_SEGREDO e PAINEL_EQUIPE.')
+    problema = problema_de_configuracao()
+    if problema:
+        raise HTTPException(status_code=503, detail=f'Painel desativado: {problema}')
     ip = _ip(request)
     if _bloqueado(ip):
         raise HTTPException(status_code=429, detail='Muitas tentativas. Espere 15 minutos.')
@@ -371,5 +388,7 @@ async def pagina():
 
 app.mount('/assets', StaticFiles(directory=PASTA_WEB / 'assets'), name='assets')
 
-if not os.getenv('PAINEL_SEGREDO'):
-    logger.warning('PAINEL_SEGREDO não configurado — ninguém consegue entrar no painel.')
+if problema_de_configuracao():
+    logger.warning(f'Login desativado: {problema_de_configuracao()}')
+else:
+    logger.info(f'Painel pronto: {len(equipe())} pessoa(s) com acesso.')

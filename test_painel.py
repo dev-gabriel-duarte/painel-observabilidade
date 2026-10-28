@@ -141,6 +141,14 @@ def grupo_1_login():
     registrar(g, 'tirar alguém do PAINEL_EQUIPE derruba a sessão dele', yuri.get('/api/sessao').status_code == 401)
     os.environ['PAINEL_EQUIPE'] = original
 
+    original = os.environ['PAINEL_EQUIPE']
+    for valor, trecho in (('Gabriel:curto', 'menos de 10'), ('Gabriel=codigo-longo-123', 'formato'), ('', 'PAINEL_EQUIPE não chegou')):
+        os.environ['PAINEL_EQUIPE'] = valor
+        r = novo().post('/api/login', json={'codigo': 'x'})
+        registrar(g, f'configuração errada explica o motivo: {trecho}', r.status_code == 503 and trecho in r.json()['detail']
+                  and 'codigo-longo' not in r.json()['detail'])
+    os.environ['PAINEL_EQUIPE'] = original
+
     segredo = os.environ.pop('PAINEL_SEGREDO')
     registrar(g, 'sem PAINEL_SEGREDO o painel fica fechado (503)',
               novo().post('/api/login', json={'codigo': 'codigo-do-gabriel'}).status_code == 503)
