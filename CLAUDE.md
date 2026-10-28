@@ -14,7 +14,7 @@ cada um, o painel mostra:
 |---|---|
 | Sistemas (no ar / lento / fora) | Checagem HTTP dos sites, páginas de status dos fornecedores (padrão Statuspage) e API do Railway |
 | Pendências | `BACKLOG.md` do repositório do projeto (`## PEN 1 — Título` + `- **Status:** ...`) |
-| Alterações | Pasta `historico/` do repositório (um `.md` por push) + últimos commits |
+| Alterações | Pasta `historico/` do repositório (um `.md` por mudança importante) + últimos commits |
 | Custos | Digitados no JSON do workspace e em `geral.json` (convertidos para R$/mês) |
 
 Primeiro workspace: `autopecas` (repositório `dev-gabriel-duarte/quintaaautopecas`).
@@ -37,7 +37,8 @@ no Railway, sem banco de dados: tudo vem do GitHub, das APIs e dos JSON.
    como texto (`el()` / `createTextNode`), nunca como HTML. CSP sem
    `unsafe-inline` — nada de `<script>` nem `style=""` inline.
 5. Custo sem valor conhecido fica `null` ("a confirmar") — não inventar número.
-6. Todo `git push` leva um registro em `historico/` (ver `historico/README.md`).
+6. Antes de cada `git push`, perguntar ao Gabriel se a mudança merece registro em
+   `historico/`. Só criar o arquivo com o aval dele (ver `historico/README.md`).
 7. Entregar com os comandos `git add` / `git commit` com várias linhas `-m`.
 
 ## Variáveis (Railway)

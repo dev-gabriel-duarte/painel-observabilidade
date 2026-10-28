@@ -1,7 +1,6 @@
 # Histórico de alterações
 
-Cada `git push` ganha um arquivo nesta pasta explicando o contexto da
-mudança: por que foi feita, o que foi implementado e como isso altera o
+As mudanças importantes ganham um arquivo nesta pasta explicando o contexto: por que foi feita, o que foi implementado e como isso altera o
 sistema no dia a dia da loja.
 
 O `git log` diz **o que** mudou no código. Estes arquivos dizem **por quê**
@@ -20,12 +19,16 @@ AAAA-MM-DD_HHMM_assunto-curto.md
 
 ## Quando criar
 
-O arquivo vai **junto no mesmo push**, não depois. Se fosse criado depois,
-ele só chegaria ao GitHub no push seguinte, e o histórico ficaria sempre
-um passo atrasado.
+**Só para mudanças importantes, e com o aval do Gabriel.** Antes de cada
+push, o Claude pergunta se a mudança merece registro. Correções pequenas
+(um texto, um ajuste de tela) normalmente não precisam: o `git log` já
+guarda essas.
 
-Ordem: terminar a mudança, rodar a bateria, escrever o arquivo do
-histórico, fazer o commit (código e histórico juntos) e dar o push.
+Quando houver registro, ele vai **junto no mesmo push**, não depois. Se
+fosse criado depois, só chegaria ao GitHub no push seguinte.
+
+Ordem: terminar a mudança, rodar a bateria, perguntar se merece registro,
+escrever o arquivo (se sim), fazer o commit e dar o push.
 
 ## Modelo
 
