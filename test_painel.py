@@ -115,6 +115,12 @@ def grupo_1_login():
     registrar(g, 'código errado: 401', novo().post('/api/login', json={'codigo': 'chute'}).status_code == 401)
     registrar(g, 'código curto demais na configuração é ignorado', 'Curto' not in painel.equipe())
     registrar(g, 'código com acento não quebra a comparação', novo().post('/api/login', json={'codigo': 'códigô'}).status_code == 401)
+    registrar(g, 'aceita "Nome:codigo" digitado (formato da variável)',
+              novo().post('/api/login', json={'codigo': 'Gabriel:codigo-do-gabriel'}).json().get('nome') == 'Gabriel'
+              and novo().post('/api/login', json={'codigo': ' gabriel : codigo-do-gabriel '}).status_code == 200)
+    registrar(g, '...mas não deixa entrar com o nome de um e o código de outro',
+              novo().post('/api/login', json={'codigo': 'Gabriel:codigo-do-yuri-1'}).json().get('nome') == 'Yuri'
+              and novo().post('/api/login', json={'codigo': 'Fulano:codigo-do-gabriel'}).status_code == 401)
 
     c = novo()
     for _ in range(8):

@@ -174,7 +174,13 @@ async def login(dados: Login, request: Request, response: Response):
     if _bloqueado(ip):
         raise HTTPException(status_code=429, detail='Muitas tentativas. Espere 15 minutos.')
     codigo = dados.codigo.strip()
-    for nome, certo in equipe().items():
+    pessoas = equipe()
+    # Aceita também "Gabriel:codigo" — é o formato da variável, e é fácil
+    # copiar o trecho com o nome junto.
+    prefixo, separador, resto = codigo.partition(':')
+    if separador and prefixo.strip().lower() in {n.lower() for n in pessoas}:
+        codigo = resto.strip()
+    for nome, certo in pessoas.items():
         if hmac.compare_digest(codigo.encode('utf-8'), certo.encode('utf-8')):
             expira = int(time.time()) + SESSAO_SEGUNDOS
             response.set_cookie(COOKIE, assinar(nome, expira), max_age=SESSAO_SEGUNDOS, httponly=True,
