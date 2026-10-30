@@ -8,7 +8,10 @@
   "branch": "main",
   "backlog": "BACKLOG.md",
   "historico": "historico",
-  "links": [{"nome": "Site", "url": "https://exemplo.com"}],
+  "links": [
+    {"grupo": "Site", "nome": "Site principal", "url": "https://exemplo.com", "descricao": "Para que serve este link.", "destaque": true},
+    {"grupo": "Ferramentas e contas", "nome": "Railway", "url": "https://railway.com/dashboard", "descricao": "Hospedagem."}
+  ],
   "sistemas": [
     {"nome": "Site (produção)", "tipo": "http", "url": "https://exemplo.com/health"},
     {"nome": "Deploys no Railway", "tipo": "railway", "projeto": "id-do-projeto-no-railway"},

@@ -16,6 +16,7 @@ cada um, o painel mostra:
 | Pendências | `BACKLOG.md` do repositório do projeto (`## PEN 1 — Título` + `- **Status:** ...`) |
 | Alterações | Pasta `historico/` do repositório (um `.md` por mudança importante) + últimos commits |
 | Custos | Digitados no JSON do workspace e em `geral.json` (convertidos para R$/mês) |
+| Links (aba própria) | `links` do JSON do workspace: `grupo`, `nome`, `url`, `descricao`; `destaque: true` também vira atalho na Visão geral; `copiar_apenas: true` para endereço que não é página (webhook). **Nunca** guardar endereço com código secreto (ex.: painel do Yuri) — fica com `url: null`. |
 
 Primeiro workspace: `autopecas` (repositório `dev-gabriel-duarte/quintaaautopecas`).
 

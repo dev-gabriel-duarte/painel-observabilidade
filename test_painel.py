@@ -316,9 +316,42 @@ def grupo_7_configuracao():
     registrar(g, 'todo sistema tem um tipo de checagem conhecido', tipos <= set(fontes._CHECADORES))
 
 
+# ── Grupo 8: aba Links ─────────────────────────────────────────────
+def grupo_8_links():
+    g = '8. Links'
+    c = logado()
+    d = c.get('/api/workspaces/autopecas').json()
+    links = d['links']
+    por_url = {l['url']: l for l in links if l['url']}
+    prod, teste = 'https://quintaaautopecas-production.up.railway.app', 'https://quintaaautopecas-teste.up.railway.app'
+    registrar(g, 'sites principal E de testes: agendamento, pedido e painel dos atendentes',
+              all(f'{base}{p}' in por_url for base in (prod, teste) for p in ('/agendar', '/agendar/novo', '/pedido', '/atendimento')))
+    registrar(g, 'todo link tem grupo e uma explicação de para que serve',
+              all(l['grupo'] and len(l['descricao']) >= 20 for l in links))
+    registrar(g, 'grupos: site principal, site de testes, ferramentas e os antigos',
+              list(dict.fromkeys(l['grupo'] for l in links)) == ['Site principal (produção)', 'Site de testes', 'Ferramentas e contas', 'Antigos / a desligar'])
+    registrar(g, 'atalhos do topo: os dois sites e os dois painéis',
+              {l['url'] for l in links if l['destaque']} >= {f'{prod}/agendar', f'{prod}/atendimento', f'{teste}/agendar', f'{teste}/atendimento'})
+    texto = (painel.PASTA_WORKSPACES / 'autopecas.json').read_text(encoding='utf-8')
+    registrar(g, 'nenhum endereço secreto guardado (painel do Yuri fica sem link)',
+              '/painel/' not in texto and 'token=' not in texto.lower()
+              and next(l for l in links if 'Yuri' in l['nome'])['url'] is None)
+    registrar(g, 'webhook da Meta: só para copiar, não vira botão de abrir', por_url[f'{prod}/webhook']['copiar_apenas'] is True)
+
+    falso = {'slug': 'x', 'links': [
+        {'nome': 'Perigo', 'url': 'javascript:alert(1)', 'grupo': 'G'}, {'url': 'https://sem-nome.com'},
+        {'nome': 'Sem grupo', 'url': 'HTTPS://ok.com', 'descricao': 'd' * 900}, 'texto solto']}
+    conferidos = painel._links(falso)
+    registrar(g, 'servidor confere: "javascript:" vira texto, sem nome é ignorado, grupo padrão e texto cortado',
+              [l['nome'] for l in conferidos] == ['Perigo', 'Sem grupo'] and conferidos[0]['url'] is None
+              and conferidos[1]['url'] == 'HTTPS://ok.com' and conferidos[1]['grupo'] == 'Links' and len(conferidos[1]['descricao']) == 400)
+    js = (painel.PASTA_WEB / 'assets' / 'painel.js').read_text(encoding='utf-8')
+    registrar(g, 'tela: aba Links com rota própria (#/ws/<slug>/links)', '(?:\\/(links))?$' in js and 'function painelLinks' in js)
+
+
 if __name__ == '__main__':
     for grupo in (grupo_1_login, grupo_2_protecoes, grupo_3_pendencias, grupo_4_custos, grupo_5_dados,
-                  grupo_6_falhas, grupo_7_configuracao):
+                  grupo_6_falhas, grupo_7_configuracao, grupo_8_links):
         try:
             grupo()
         except Exception as erro:  # um grupo quebrado aparece como falha, não esconde os outros

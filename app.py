@@ -307,6 +307,27 @@ async def lista_workspaces(request: Request):
     }
 
 
+def _links(ws: dict) -> list:
+    """Links do workspace, conferidos: só endereço http(s) vira link (um
+    "javascript:" esquecido no JSON não chega à tela) e todo link tem grupo.
+    Link sem endereço é permitido — serve para dizer que algo existe sem
+    guardar um endereço secreto aqui."""
+    links = []
+    for item in ws.get('links', []):
+        if not isinstance(item, dict) or not item.get('nome'):
+            continue
+        url = item.get('url')
+        links.append({
+            'nome': str(item['nome'])[:80],
+            'url': url if isinstance(url, str) and re.match(r'^https?://', url, re.I) else None,
+            'descricao': str(item.get('descricao') or '')[:400],
+            'grupo': str(item.get('grupo') or 'Links')[:60],
+            'destaque': bool(item.get('destaque')),
+            'copiar_apenas': bool(item.get('copiar_apenas')),
+        })
+    return links
+
+
 @app.get('/api/workspaces/{slug}')
 async def detalhe_workspace(slug: str, request: Request):
     exigir_login(request)
@@ -318,7 +339,7 @@ async def detalhe_workspace(slug: str, request: Request):
     return {
         'slug': ws['slug'], 'nome': ws.get('nome', slug), 'descricao': ws.get('descricao', ''),
         'icone': ws.get('icone', 'caixa'), 'cor': ws.get('cor', '#4C6EF5'),
-        'repositorio': ws.get('repositorio', ''), 'links': ws.get('links', []),
+        'repositorio': ws.get('repositorio', ''), 'links': _links(ws),
         'estado': fontes.estado_geral(sistemas['dados']),
         'sistemas': sistemas, 'pendencias': pendencias, 'historico': historico, 'commits': commits,
         'custos': resumir_custos(ws.get('custos', []), geral.get('cotacao') or {'BRL': 1}),

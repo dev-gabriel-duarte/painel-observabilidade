@@ -9,42 +9,280 @@
   "backlog": "BACKLOG.md",
   "historico": "historico",
   "links": [
-    {"nome": "Site de agendamento", "url": "https://quintaaautopecas-production.up.railway.app/agendar"},
-    {"nome": "Painel dos atendentes", "url": "https://quintaaautopecas-production.up.railway.app/atendimento"},
-    {"nome": "Repositório no GitHub", "url": "https://github.com/dev-gabriel-duarte/quintaaautopecas"},
-    {"nome": "Railway", "url": "https://railway.com/dashboard"},
-    {"nome": "Supabase", "url": "https://supabase.com/dashboard/projects"}
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Site de agendamento",
+      "url": "https://quintaaautopecas-production.up.railway.app/agendar",
+      "descricao": "Página dos clientes: lista de serviços e botão para agendar. É o link que vai na mensagem do WhatsApp Business.",
+      "destaque": true
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Agendar direto (assistente)",
+      "url": "https://quintaaautopecas-production.up.railway.app/agendar/novo",
+      "descricao": "O passo a passo do agendamento. Aceita ?servico= e ?tel= — o botão \"Enviar link do site\" do painel monta esse link já com o WhatsApp do cliente."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Pedido de orçamento",
+      "url": "https://quintaaautopecas-production.up.railway.app/pedido",
+      "descricao": "Formulário público \"Orçamento de peça\" ou \"Outro assunto\". O pedido cai na aba Pedidos do painel."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Painel dos atendentes",
+      "url": "https://quintaaautopecas-production.up.railway.app/atendimento",
+      "descricao": "Área interna: agenda, boxes, pedidos, lembretes e mural. Entra com o código de cada atendente.",
+      "destaque": true
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Exclusão de dados (LGPD)",
+      "url": "https://quintaaautopecas-production.up.railway.app/exclusao-de-dados",
+      "descricao": "Como o cliente pede para apagar os dados dele. Página pública exigida pela LGPD."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Política de privacidade",
+      "url": "https://quintaaautopecas-production.up.railway.app/privacy-policy",
+      "descricao": "Exigida pela Meta no app da API do WhatsApp (época do bot)."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Saúde do sistema",
+      "url": "https://quintaaautopecas-production.up.railway.app/health",
+      "descricao": "Resposta curta \"no ar\". É o que este painel consulta para saber se o site está funcionando."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Painel de acompanhamento (Yuri)",
+      "url": null,
+      "descricao": "Números de agendamentos e pedidos. O endereço tem um código secreto (DASHBOARD_TOKEN no Railway) e por isso NÃO fica guardado aqui."
+    },
+    {
+      "grupo": "Site principal (produção)",
+      "nome": "Webhook da Meta",
+      "url": "https://quintaaautopecas-production.up.railway.app/webhook",
+      "descricao": "Endereço que a Meta chama a cada mensagem (Callback URL no painel da Meta). Só para o bot, que está aposentado. Não é página para abrir.",
+      "copiar_apenas": true
+    },
+    {
+      "grupo": "Site de testes",
+      "nome": "Site de agendamento (teste)",
+      "url": "https://quintaaautopecas-teste.up.railway.app/agendar",
+      "descricao": "Cópia do site com faixa amarela, banco próprio (5a-testes) e dados de mentira. Tudo novo aparece aqui antes de ir para o principal.",
+      "destaque": true
+    },
+    {
+      "grupo": "Site de testes",
+      "nome": "Agendar direto (teste)",
+      "url": "https://quintaaautopecas-teste.up.railway.app/agendar/novo",
+      "descricao": "O assistente de agendamento no ambiente de testes."
+    },
+    {
+      "grupo": "Site de testes",
+      "nome": "Pedido de orçamento (teste)",
+      "url": "https://quintaaautopecas-teste.up.railway.app/pedido",
+      "descricao": "O formulário de pedido no ambiente de testes."
+    },
+    {
+      "grupo": "Site de testes",
+      "nome": "Painel dos atendentes (teste)",
+      "url": "https://quintaaautopecas-teste.up.railway.app/atendimento",
+      "descricao": "Painel do ambiente de testes. Os códigos de acesso são outros, diferentes dos da produção.",
+      "destaque": true
+    },
+    {
+      "grupo": "Site de testes",
+      "nome": "Saúde do sistema (teste)",
+      "url": "https://quintaaautopecas-teste.up.railway.app/health",
+      "descricao": "Mostra se o site de testes está no ar."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "GitHub — código do sistema",
+      "url": "https://github.com/dev-gabriel-duarte/quintaaautopecas",
+      "descricao": "Onde o código mora. Branch \"main\" = site principal; branch \"teste\" = site de testes.",
+      "destaque": true
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Railway",
+      "url": "https://railway.com/dashboard",
+      "descricao": "Hospedagem dos sites. Ambientes \"production\" e \"teste\", variáveis (códigos, chaves) e logs de erro."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Supabase",
+      "url": "https://supabase.com/dashboard/projects",
+      "descricao": "Banco de dados: agenda, pedidos, anotações e histórico. Projeto da produção e o \"5a-testes\". As migrações rodam no SQL Editor."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Upstash (Redis)",
+      "url": "https://console.upstash.com",
+      "descricao": "Memória rápida: limites anti-abuso, travas e marcas dos lembretes. O site de testes usa o mesmo, com o prefixo \"teste:\"."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Google Agenda",
+      "url": "https://calendar.google.com",
+      "descricao": "Cópia de segurança da agenda (agenda \"Oficina 5ª Auto Peças\"). O sistema só escreve nela, nunca lê."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Google Cloud",
+      "url": "https://console.cloud.google.com",
+      "descricao": "Credencial (conta de serviço) que deixa o sistema escrever no Google Agenda."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Meta for Developers",
+      "url": "https://developers.facebook.com/apps",
+      "descricao": "App da API do WhatsApp da época do bot: webhook, templates e token."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Meta Business Suite",
+      "url": "https://business.facebook.com",
+      "descricao": "Conta comercial da loja na Meta (Facebook, Instagram e WhatsApp)."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Anthropic (Claude)",
+      "url": "https://console.anthropic.com",
+      "descricao": "Chave e gastos da IA usada no classificador de mensagens (análise, uso pequeno)."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "Painel de observabilidade",
+      "url": "https://painel-observabilidade.up.railway.app",
+      "descricao": "Este painel: sistemas, custos, pendências e alterações de todos os projetos."
+    },
+    {
+      "grupo": "Ferramentas e contas",
+      "nome": "registro.br",
+      "url": "https://registro.br",
+      "descricao": "Registro de domínio .com.br (a verificação ficou travada; o domínio próprio ainda está em decisão)."
+    },
+    {
+      "grupo": "Antigos / a desligar",
+      "nome": "Chatwoot (central de conversas)",
+      "url": "https://168-119-166-103.sslip.io",
+      "descricao": "Tela de conversas da época do bot, no servidor da Hetzner. Desligar ~30 dias depois da migração para o WhatsApp Business."
+    },
+    {
+      "grupo": "Antigos / a desligar",
+      "nome": "Hetzner Cloud",
+      "url": "https://console.hetzner.cloud",
+      "descricao": "Servidor onde roda o Chatwoot (CX23). Sai junto com o Chatwoot."
+    },
+    {
+      "grupo": "Antigos / a desligar",
+      "nome": "Ambiente demo antigo",
+      "url": "https://talented-vision-production-696b.up.railway.app",
+      "descricao": "Cópia da época do bot (branch demo-cliente). Substituído pelo site de testes — a desligar no Railway."
+    }
   ],
   "sistemas": [
-    {"nome": "Site e painel (produção)", "tipo": "http",
-     "url": "https://quintaaautopecas-production.up.railway.app/health",
-     "painel": "https://quintaaautopecas-production.up.railway.app/agendar"},
-    {"nome": "Ambiente demo", "tipo": "http",
-     "url": "https://talented-vision-production-696b.up.railway.app/health"},
-    {"nome": "Chatwoot (Hetzner)", "tipo": "http",
-     "url": "https://168-119-166-103.sslip.io", "painel": "https://168-119-166-103.sslip.io"},
-    {"nome": "Deploys no Railway", "tipo": "railway", "projeto": null, "painel": "https://railway.com/dashboard"},
-    {"nome": "Supabase (plataforma)", "tipo": "statuspage",
-     "url": "https://status.supabase.com/api/v2/status.json", "painel": "https://status.supabase.com"},
-    {"nome": "GitHub (plataforma)", "tipo": "statuspage",
-     "url": "https://www.githubstatus.com/api/v2/status.json", "painel": "https://www.githubstatus.com"},
-    {"nome": "Anthropic / Claude (plataforma)", "tipo": "statuspage",
-     "url": "https://status.anthropic.com/api/v2/status.json", "painel": "https://status.anthropic.com"}
+    {
+      "nome": "Site e painel (produção)",
+      "tipo": "http",
+      "url": "https://quintaaautopecas-production.up.railway.app/health",
+      "painel": "https://quintaaautopecas-production.up.railway.app/agendar"
+    },
+    {
+      "nome": "Ambiente demo",
+      "tipo": "http",
+      "url": "https://talented-vision-production-696b.up.railway.app/health"
+    },
+    {
+      "nome": "Chatwoot (Hetzner)",
+      "tipo": "http",
+      "url": "https://168-119-166-103.sslip.io",
+      "painel": "https://168-119-166-103.sslip.io"
+    },
+    {
+      "nome": "Deploys no Railway",
+      "tipo": "railway",
+      "projeto": null,
+      "painel": "https://railway.com/dashboard"
+    },
+    {
+      "nome": "Supabase (plataforma)",
+      "tipo": "statuspage",
+      "url": "https://status.supabase.com/api/v2/status.json",
+      "painel": "https://status.supabase.com"
+    },
+    {
+      "nome": "GitHub (plataforma)",
+      "tipo": "statuspage",
+      "url": "https://www.githubstatus.com/api/v2/status.json",
+      "painel": "https://www.githubstatus.com"
+    },
+    {
+      "nome": "Anthropic / Claude (plataforma)",
+      "tipo": "statuspage",
+      "url": "https://status.anthropic.com/api/v2/status.json",
+      "painel": "https://status.anthropic.com"
+    }
   ],
   "custos": [
-    {"item": "Railway (plano Hobby)", "valor": 5, "moeda": "USD", "periodo": "mensal", "confirmado": false,
-     "obs": "Inclui US$ 5 de uso por mês; acima disso cobra a diferença. Conferir na fatura do Railway."},
-    {"item": "Supabase", "valor": 0, "moeda": "USD", "periodo": "mensal", "confirmado": false,
-     "obs": "Plano Free = US$ 0; plano Pro = US$ 25. Conferir qual está ativo."},
-    {"item": "Upstash Redis", "valor": 0, "moeda": "USD", "periodo": "mensal", "confirmado": false,
-     "obs": "Plano gratuito cobre o volume atual. Conferir no painel da Upstash."},
-    {"item": "Hetzner CX23 (Chatwoot)", "valor": 4.5, "moeda": "EUR", "periodo": "mensal", "confirmado": false,
-     "obs": "Valor aproximado. Pode ser desligado depois de ~30 dias da migração para o WhatsApp Business."},
-    {"item": "Backup automático Hetzner", "valor": null, "moeda": "BRL", "periodo": "mensal", "confirmado": false,
-     "obs": "Cerca de R$ 7/mês se estiver ativado — não confirmado."},
-    {"item": "API da Anthropic (classificador)", "valor": null, "moeda": "USD", "periodo": "mensal", "confirmado": false,
-     "obs": "Só roda na análise de primeiras mensagens; uso muito pequeno. Conferir em console.anthropic.com."},
-    {"item": "WhatsApp (Meta)", "valor": 0, "moeda": "BRL", "periodo": "mensal", "confirmado": true,
-     "obs": "App WhatsApp Business é gratuito (a API cobrava por conversa)."}
+    {
+      "item": "Railway (plano Hobby)",
+      "valor": 5,
+      "moeda": "USD",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Inclui US$ 5 de uso por mês; acima disso cobra a diferença. Conferir na fatura do Railway."
+    },
+    {
+      "item": "Supabase",
+      "valor": 0,
+      "moeda": "USD",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Plano Free = US$ 0; plano Pro = US$ 25. Conferir qual está ativo."
+    },
+    {
+      "item": "Upstash Redis",
+      "valor": 0,
+      "moeda": "USD",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Plano gratuito cobre o volume atual. Conferir no painel da Upstash."
+    },
+    {
+      "item": "Hetzner CX23 (Chatwoot)",
+      "valor": 4.5,
+      "moeda": "EUR",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Valor aproximado. Pode ser desligado depois de ~30 dias da migração para o WhatsApp Business."
+    },
+    {
+      "item": "Backup automático Hetzner",
+      "valor": null,
+      "moeda": "BRL",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Cerca de R$ 7/mês se estiver ativado — não confirmado."
+    },
+    {
+      "item": "API da Anthropic (classificador)",
+      "valor": null,
+      "moeda": "USD",
+      "periodo": "mensal",
+      "confirmado": false,
+      "obs": "Só roda na análise de primeiras mensagens; uso muito pequeno. Conferir em console.anthropic.com."
+    },
+    {
+      "item": "WhatsApp (Meta)",
+      "valor": 0,
+      "moeda": "BRL",
+      "periodo": "mensal",
+      "confirmado": true,
+      "obs": "App WhatsApp Business é gratuito (a API cobrava por conversa)."
+    }
   ]
 }

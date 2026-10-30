@@ -126,12 +126,12 @@ function sessaoCaiu(erro) {
   return true;
 }
 
-// ── Rotas: #/  e  #/ws/<slug> ─────────────────────────
+// ── Rotas: #/, #/ws/<slug> e #/ws/<slug>/links ─────────
 window.addEventListener('hashchange', rotear);
 let carregando = 0;
 
 async function rotear() {
-  const ws = location.hash.match(/^#\/ws\/([a-z0-9-]+)$/);
+  const ws = location.hash.match(/^#\/ws\/([a-z0-9-]+)(?:\/(links))?$/);
   const minha = ++carregando;
   const conteudo = $('conteudo');
   conteudo.replaceChildren(el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }));
@@ -139,7 +139,7 @@ async function rotear() {
     if (ws) {
       const dados = await api(`/api/workspaces/${ws[1]}`);
       if (minha !== carregando) return;
-      desenharWorkspace(dados);
+      desenharWorkspace(dados, ws[2] || 'geral');
     } else {
       const dados = await api('/api/workspaces');
       if (minha !== carregando) return;
@@ -207,22 +207,62 @@ function cartaoWorkspace(w) {
 // ── Um workspace ──────────────────────────────────────
 let filtroPendencias = 'abertas';
 
-function desenharWorkspace(w) {
-  trilha(w.nome);
-  document.title = `${w.nome} · Observabilidade`;
+function desenharWorkspace(w, aba) {
+  trilha(w.nome, ...(aba === 'links' ? ['Links'] : []));
+  document.title = `${aba === 'links' ? 'Links · ' : ''}${w.nome} · Observabilidade`;
+  const atalhos = w.links.filter((l) => l.destaque && l.url);
   $('conteudo').replaceChildren(
     el('div', { class: 'titulo-pagina' },
       el('div', { class: 'cabeca-ws', cor: w.cor },
         el('span', { class: 'ws-icone' }, icone(w.icone)),
         el('div', {}, el('h1', {}, w.nome), el('p', { class: 'suave' }, w.descricao))),
       selo(w.estado)),
-    w.links.length ? el('div', { class: 'links' }, w.links.map((l) => linkExterno(l.url, l.nome, 'botao'))) : null,
+    el('nav', { class: 'abas', 'aria-label': 'Seções do projeto' },
+      el('a', { href: `#/ws/${w.slug}`, 'aria-current': aba === 'geral' ? 'page' : null }, 'Visão geral'),
+      el('a', { href: `#/ws/${w.slug}/links`, 'aria-current': aba === 'links' ? 'page' : null }, `Links (${w.links.length})`)),
+    aba === 'links' ? painelLinks(w) : visaoGeral(w, atalhos),
+  );
+}
+
+function visaoGeral(w, atalhos) {
+  return el('div', {},
+    atalhos.length ? el('div', { class: 'links' }, atalhos.map((l) => linkExterno(l.url, l.nome, 'botao'))) : null,
     el('div', { class: 'grade-detalhe' },
       el('div', { class: 'coluna' }, painelPendencias(w), painelHistorico(w), painelCommits(w)),
       el('div', { class: 'coluna' }, painelSistemas(w),
         el('section', { class: 'painel' }, el('div', { class: 'painel-topo' }, el('h2', {}, 'Custos'),
-          el('span', { class: 'suave' }, 'por mês, em reais')), tabelaCustos(w.custos, w.cotacao_data)))),
-  );
+          el('span', { class: 'suave' }, 'por mês, em reais')), tabelaCustos(w.custos, w.cotacao_data)))));
+}
+
+// ── Aba Links: todos os endereços do projeto, por grupo ──
+function painelLinks(w) {
+  if (!w.links.length) return el('p', { class: 'vazio' }, 'Nenhum link configurado. Eles ficam em "links" no arquivo do workspace.');
+  const grupos = new Map();
+  for (const l of w.links) {
+    if (!grupos.has(l.grupo)) grupos.set(l.grupo, []);
+    grupos.get(l.grupo).push(l);
+  }
+  return el('div', { class: 'grade-links' }, [...grupos].map(([grupo, itens]) =>
+    painel(grupo, `${itens.length} ${itens.length === 1 ? 'link' : 'links'}`,
+      el('ul', { class: 'lista' }, itens.map(linhaLink)))));
+}
+
+function linhaLink(l) {
+  return el('li', { class: 'link-item' },
+    l.url && !l.copiar_apenas ? linkExterno(l.url, l.nome, 'link-nome') : el('strong', { class: 'link-nome' }, l.nome),
+    l.url ? el('button', { class: 'botao fantasma copiar', type: 'button', 'aria-label': `Copiar o endereço de ${l.nome}`, onclick: (e) => copiar(l.url, e.currentTarget) }, 'Copiar') : null,
+    el('span', { class: 'mono endereco' }, l.url ? l.url.replace(/^https?:\/\//, '') : 'endereço não guardado aqui'),
+    l.descricao ? el('p', {}, l.descricao) : null);
+}
+
+async function copiar(texto, botao) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    botao.textContent = 'Copiado ✓';
+  } catch {
+    botao.textContent = 'Não copiou';
+  }
+  setTimeout(() => { botao.textContent = 'Copiar'; }, 1600);
 }
 
 function linkExterno(url, texto, classe) {
