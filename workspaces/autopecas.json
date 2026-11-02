@@ -167,15 +167,9 @@
     },
     {
       "grupo": "Antigos / a desligar",
-      "nome": "Chatwoot (central de conversas)",
-      "url": "https://168-119-166-103.sslip.io",
-      "descricao": "Tela de conversas da época do bot, no servidor da Hetzner. Desligar ~30 dias depois da migração para o WhatsApp Business."
-    },
-    {
-      "grupo": "Antigos / a desligar",
       "nome": "Hetzner Cloud",
       "url": "https://console.hetzner.cloud",
-      "descricao": "Servidor onde roda o Chatwoot (CX23). Sai junto com o Chatwoot."
+      "descricao": "Conta da Hetzner. O servidor do Chatwoot foi cancelado em 01/11/2026 — conferir que não sobrou cobrança (servidor, backup)."
     },
     {
       "grupo": "Antigos / a desligar",
@@ -195,12 +189,6 @@
       "nome": "Ambiente demo",
       "tipo": "http",
       "url": "https://talented-vision-production-696b.up.railway.app/health"
-    },
-    {
-      "nome": "Chatwoot (Hetzner)",
-      "tipo": "http",
-      "url": "https://168-119-166-103.sslip.io",
-      "painel": "https://168-119-166-103.sslip.io"
     },
     {
       "nome": "Deploys no Railway",
@@ -251,14 +239,6 @@
       "periodo": "mensal",
       "confirmado": false,
       "obs": "Plano gratuito cobre o volume atual. Conferir no painel da Upstash."
-    },
-    {
-      "item": "Hetzner CX23 (Chatwoot)",
-      "valor": 4.5,
-      "moeda": "EUR",
-      "periodo": "mensal",
-      "confirmado": false,
-      "obs": "Valor aproximado. Pode ser desligado depois de ~30 dias da migração para o WhatsApp Business."
     },
     {
       "item": "Backup automático Hetzner",
