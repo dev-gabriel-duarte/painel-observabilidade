@@ -15,10 +15,15 @@ cada um, o painel mostra:
 | Sistemas (no ar / lento / fora) | Checagem HTTP dos sites, páginas de status dos fornecedores (padrão Statuspage) e API do Railway |
 | Pendências | `BACKLOG.md` do repositório do projeto (`## PEN 1 — Título` + `- **Status:** ...`) |
 | Alterações | Pasta `historico/` do repositório (um `.md` por mudança importante) + últimos commits |
+| Linha do tempo (aba própria) | A mesma pasta `historico/`, contada em **etapas**: cartões lado a lado, ligados por linhas (formato pedido pelo Gabriel em 17/11). Cada marco (`Impacto: alto`) abre uma etapa e as mudanças seguintes ficam dentro dela, com a contagem na bolinha (`fontes.agrupar_em_etapas`; sem marcos, uma etapa por mês). Nome do cartão: linha `Etapa` do marco. Cabeçalho lido por `fontes.ler_registro` (`Tipo`, `Impacto`, `Resumo`, `Etapa`, `Versão`, `Publicado na produção?`, `Commits`). Última etapa: "Próximos", com as pendências abertas do `BACKLOG.md`. Modelo no `historico/README.md`. |
 | Custos | Digitados no JSON do workspace e em `geral.json` (convertidos para R$/mês) |
 | Links (aba própria) | `links` do JSON do workspace: `grupo`, `nome`, `url`, `descricao`; `destaque: true` também vira atalho na Visão geral; `copiar_apenas: true` para endereço que não é página (webhook). **Nunca** guardar endereço com código secreto (ex.: painel do Yuri) — fica com `url: null`. |
 
 Primeiro workspace: `autopecas` (repositório `dev-gabriel-duarte/quintaaautopecas`).
+
+Os textos do `historico/` ficam guardados pelo **sha do arquivo no git**
+(`fontes._TEXTOS_POR_SHA`): mesmo sha = mesmo conteúdo, então só registro novo ou
+editado é baixado de novo. Isso poupa a cota do GitHub mesmo com o "Atualizar agora".
 
 ## Stack
 

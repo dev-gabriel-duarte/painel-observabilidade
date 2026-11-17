@@ -266,6 +266,22 @@ async def _historico(ws: dict) -> list:
         ws['repositorio'], ws.get('historico', 'historico'), ws.get('branch', 'main')))
 
 
+async def _linha_do_tempo(ws: dict) -> list:
+    if not ws.get('repositorio'):
+        return []
+    return await fontes.em_cache(f'linha:{ws["slug"]}', lambda: fontes.listar_linha_do_tempo(
+        ws['repositorio'], ws.get('historico', 'historico'), ws.get('branch', 'main')))
+
+
+def _proximos(pendencias: list) -> list:
+    """Pendências abertas na ordem em que aparecem depois do último ponto da
+    linha do tempo: primeiro o que já está em andamento, depois por prioridade.
+    Dentro do mesmo grupo, a ordem do BACKLOG.md (o sort do Python é estável)."""
+    peso = {'alta': 0, 'media': 1, 'média': 1, 'baixa': 2}
+    abertas = [p for p in pendencias if p.get('aberta')]
+    return sorted(abertas, key=lambda p: ('andamento' not in p.get('status', ''), peso.get(p.get('prioridade', ''), 3)))
+
+
 async def _commits(ws: dict) -> list:
     if not ws.get('repositorio'):
         return []
@@ -360,6 +376,18 @@ async def registro_historico(slug: str, arquivo: str, request: Request):
     except fontes.FonteIndisponivel as erro:
         raise HTTPException(status_code=502, detail=str(erro))
     return {'arquivo': arquivo, 'markdown': texto}
+
+
+@app.get('/api/workspaces/{slug}/linha-do-tempo')
+async def linha_do_tempo(slug: str, request: Request):
+    """Aba "Linha do tempo": a história em etapas (um marco abre cada etapa, com
+    as mudanças seguintes dentro dela), do mais antigo ao mais novo. Depois da
+    última, as pendências abertas como "próximos"."""
+    exigir_login(request)
+    ws = _workspace(slug)
+    pontos, pendencias = await asyncio.gather(_bloco(lambda: _linha_do_tempo(ws)), _bloco(lambda: _pendencias(ws)))
+    return {'etapas': {'dados': fontes.agrupar_em_etapas(pontos['dados']), 'erro': pontos['erro']},
+            'proximos': {'dados': _proximos(pendencias['dados']), 'erro': pendencias['erro']}}
 
 
 @app.post('/api/atualizar')

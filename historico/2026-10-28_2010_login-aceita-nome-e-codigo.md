@@ -3,6 +3,9 @@
 - **Data do push:** 28/10/2026 às 20:10 (Brasília)
 - **Branch:** `main`
 - **Publicado na produção?** Sim (o Railway publica sozinho).
+- **Tipo:** melhoria
+- **Impacto:** baixo
+- **Resumo:** O login aceita o código digitado no formato da variável ("Nome:codigo"), sem deixar entrar com o nome de um e o código de outro.
 
 ## Contexto
 

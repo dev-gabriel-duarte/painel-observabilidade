@@ -30,6 +30,20 @@ fosse criado depois, só chegaria ao GitHub no push seguinte.
 Ordem: terminar a mudança, rodar a bateria, perguntar se merece registro,
 escrever o arquivo (se sim), fazer o commit e dar o push.
 
+## Linha do tempo
+
+A aba "Linha do tempo" de cada projeto lê a pasta `historico/` do repositório
+dele e conta a história em **etapas**: cartões lado a lado, ligados por linhas.
+Cada **marco** (`Impacto: alto`) abre uma etapa; as mudanças seguintes, até o
+próximo marco, ficam dentro dela (o número na bolinha). **Etapa** é o nome curto
+do cartão, só nos marcos (sem ela, vai o título). **Tipo** dá a etiqueta colorida
+de cada mudança e o ícone do cartão (pode ter mais de um, separados por vírgula);
+**Resumo** é o texto da mudança (sem ele, o primeiro parágrafo do Contexto);
+**Publicado na produção?** dá o selo "Na produção" ou "Só no teste"; cada commit
+vira link. **Versão** é opcional e só quando o sistema tem número de verdade.
+Registro sem essas linhas continua aparecendo — nada é adivinhado. Projeto sem
+nenhum marco: uma etapa por mês.
+
 ## Modelo
 
 ```markdown
@@ -39,6 +53,10 @@ escrever o arquivo (se sim), fazer o commit e dar o push.
 - **Branch:** main (produção) | demo-cliente | outro
 - **Commits:** abc1234, def5678
 - **Publicado na produção?** Sim / Não (por quê)
+- **Tipo:** função nova | melhoria | correção | segurança | infraestrutura | documentação
+- **Impacto:** alto | médio | baixo
+- **Resumo:** Uma frase: o que muda para quem usa.
+- **Etapa:** Nome curto (só quando o Impacto é alto)
 
 ## Contexto
 Qual era o problema ou o pedido. O que motivou a mudança.

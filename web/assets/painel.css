@@ -171,6 +171,72 @@ a.link-nome:hover { color: var(--destaque); }
 .tabela-custos tfoot td { font-weight: 700; background: var(--fundo-2); }
 .estimado { display: inline-block; margin-left: 6px; font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 5px; background: rgba(245, 185, 66, 0.14); color: #f7c96a; vertical-align: 1px; }
 
+/* Linha do tempo — cor de cada tipo de mudança (sempre junto do nome, nunca só a cor) */
+.t-funcao { --cor-tipo: #63e6be; }
+.t-melhoria { --cor-tipo: #4dabf7; }
+.t-correcao { --cor-tipo: #ffa94d; }
+.t-seguranca { --cor-tipo: #da77f2; }
+.t-infraestrutura { --cor-tipo: #f783ac; }
+.t-documentacao { --cor-tipo: #adb5bd; }
+.t-outro { --cor-tipo: #868e96; }
+.t-sem { --cor-tipo: #5c636e; }
+.ver-mais { font-size: 12.5px; color: var(--destaque); text-decoration: none; }
+.ver-mais:hover { text-decoration: underline; }
+.aviso-fonte.solto { margin: 0 0 16px; }
+
+/* Etapas lado a lado, ligadas por linhas, sobre um fundo de pontinhos */
+.palco { --fundo-palco: #0b0c0f; overflow-x: auto; user-select: none; -webkit-user-select: none; overflow-y: hidden; padding: 40px 32px 48px; border: 1px solid var(--linha); border-radius: 18px; background-color: var(--fundo-palco); background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1.3px); background-size: 22px 22px; cursor: grab; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--linha-forte) transparent; }
+.palco.arrastando { cursor: grabbing; }
+.palco.arrastando .no-etapa { cursor: grabbing; }
+.trilho { display: flex; align-items: center; width: max-content; }
+.no-etapa { --cor-etapa: #e9ecef; position: relative; flex: none; display: flex; align-items: center; gap: 14px; min-width: 250px; max-width: 360px; padding: 18px 24px 24px 18px; border: 1.5px solid color-mix(in srgb, var(--cor-etapa) 72%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--cor-etapa) 9%, #121318); box-shadow: 0 0 22px color-mix(in srgb, var(--cor-etapa) 20%, transparent), inset 0 0 18px color-mix(in srgb, var(--cor-etapa) 6%, transparent); color: var(--texto); text-align: left; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, background 0.2s; }
+.no-etapa:hover { transform: translateY(-2px); }
+.no-etapa.escolhida { border-color: var(--cor-etapa); background: color-mix(in srgb, var(--cor-etapa) 17%, #121318); box-shadow: 0 0 38px color-mix(in srgb, var(--cor-etapa) 42%, transparent), inset 0 0 24px color-mix(in srgb, var(--cor-etapa) 12%, transparent); }
+.no-etapa:focus-visible { outline: 2px solid var(--cor-etapa); outline-offset: 5px; }
+.no-icone { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 11px; color: var(--cor-etapa); background: color-mix(in srgb, var(--cor-etapa) 15%, #1a1c22); border: 1px solid color-mix(in srgb, var(--cor-etapa) 30%, transparent); }
+.no-icone svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.no-textos { display: grid; gap: 3px; min-width: 0; }
+.no-rotulo { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cor-etapa); }
+.no-titulo { font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.no-contagem { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 50%); display: grid; place-items: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 999px; background: var(--cor-etapa); color: var(--fundo-palco); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 4px var(--fundo-palco), 0 0 16px color-mix(in srgb, var(--cor-etapa) 60%, transparent); }
+.conector { --cor-etapa: #e9ecef; flex: none; width: 96px; height: 2px; margin: 0 14px; border-radius: 2px; background: color-mix(in srgb, var(--cor-etapa) 78%, transparent); box-shadow: 0 0 8px color-mix(in srgb, var(--cor-etapa) 45%, transparent); }
+.no-etapa.proximo { border-style: dashed; background: rgba(255, 255, 255, 0.02); box-shadow: none; }
+.no-etapa.proximo.escolhida { background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 26px rgba(154, 161, 173, 0.18); }
+.conector.proximo { background: repeating-linear-gradient(90deg, var(--cor-etapa) 0 8px, transparent 8px 14px); box-shadow: none; }
+.dica-palco { margin: 10px 2px 18px; font-size: 12.5px; color: var(--fraco); }
+
+/* Mudanças da etapa escolhida */
+.detalhe-etapa { --cor-etapa: #e9ecef; padding: 20px 22px 6px; background: var(--cartao); border: 1px solid var(--linha); border-top: 3px solid var(--cor-etapa); border-radius: 18px; }
+.detalhe-cabeca h2 { margin: 6px 0 6px; font-size: 22px; letter-spacing: -0.02em; }
+.detalhe-cabeca .resumo-tempo { max-width: 780px; }
+.detalhe-etapa .aviso-fonte { margin: 14px 0 0; }
+.mudancas { list-style: none; margin: 16px 0 0; padding: 0; }
+.mudanca { display: grid; gap: 6px; padding: 14px 0 14px 14px; border-top: 1px solid var(--linha); border-left: 3px solid var(--cor-tipo, var(--linha-forte)); }
+.titulo-pendencia { font-size: 14.5px; }
+.meta-tempo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--suave); }
+.meta-tempo time { margin-right: 2px; font-variant-numeric: tabular-nums; }
+.meta-tempo .codigo { font-family: var(--mono); font-size: 12px; padding: 1px 8px; border-radius: 6px; background: var(--cartao-2); color: var(--destaque); }
+.tipo { padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; color: var(--cor-tipo); background: color-mix(in srgb, var(--cor-tipo) 14%, transparent); }
+.selo-mini { padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: var(--cartao-2); color: var(--suave); }
+.selo-mini.marco { background: rgba(255, 255, 255, 0.09); color: var(--texto); }
+.selo-mini.versao { font-family: var(--mono); font-weight: 500; }
+.selo-mini.producao { background: rgba(61, 220, 151, 0.12); color: var(--ok); }
+.selo-mini.teste { background: rgba(245, 185, 66, 0.13); color: var(--atencao); }
+.selo-mini.andamento { background: rgba(77, 171, 247, 0.14); color: #74c0fc; }
+.titulo-tempo, .ler-registro { all: unset; cursor: pointer; }
+.titulo-tempo { font-weight: 600; font-size: 15px; line-height: 1.35; }
+.titulo-tempo:hover { color: var(--destaque); }
+.titulo-tempo:focus-visible, .ler-registro:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; border-radius: 4px; }
+.resumo-tempo { margin: 0; font-size: 13.5px; color: var(--suave); }
+.resumo-tempo.curto { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.resumo-tempo code { font-family: var(--mono); font-size: 11.5px; padding: 0 4px; border-radius: 4px; background: var(--cartao-2); color: var(--texto); }
+.rodape-tempo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.commits-tempo { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.commits-tempo a { color: var(--destaque); text-decoration: none; }
+.commits-tempo a:hover { text-decoration: underline; }
+.ler-registro { font-size: 12.5px; color: var(--suave); }
+.ler-registro:hover { color: var(--texto); }
+
 /* Esqueleto */
 .esqueleto { height: 120px; border-radius: 18px; background: linear-gradient(90deg, var(--cartao) 0%, var(--cartao-2) 50%, var(--cartao) 100%); background-size: 200% 100%; animation: brilho 1.4s infinite; }
 @keyframes brilho { to { background-position: -200% 0; } }
@@ -202,6 +268,13 @@ a.link-nome:hover { color: var(--destaque); }
   .conteudo { padding: 20px 16px 48px; }
   .grade-ws { grid-template-columns: 1fr; }
   .markdown { padding: 4px 18px 32px; }
+  .palco { padding: 30px 18px 44px; }
+  .no-etapa { min-width: 220px; padding: 14px 18px 22px 14px; gap: 12px; }
+  .no-icone { width: 38px; height: 38px; }
+  .no-titulo { font-size: 17px; }
+  .conector { width: 48px; margin: 0 10px; }
+  .detalhe-etapa { padding: 16px 16px 4px; }
+  .detalhe-cabeca h2 { font-size: 19px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before { animation: none !important; transition: none !important; }

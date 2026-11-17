@@ -10,6 +10,7 @@ function el(tag, atributos = {}, ...filhos) {
     if (chave === 'class') no.className = valor;
     else if (chave.startsWith('on')) no.addEventListener(chave.slice(2), valor);
     else if (chave === 'cor') no.style.setProperty('--cor-ws', valor);
+    else if (chave.startsWith('--')) no.style.setProperty(chave, valor); // cor das etapas (constante nossa)
     else no.setAttribute(chave, valor === true ? '' : valor);
   }
   for (const filho of filhos.flat()) {
@@ -26,6 +27,12 @@ const ICONES = {
   loja: '<path d="M3 9 5 4h14l2 5M3 9v11h18V9M3 9h18M9 20v-6h6v6"/>',
   grafico: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   codigo: '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>',
+  estrela: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/>',
+  subir: '<path d="m3 17 6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+  escudo: '<path d="M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  servidor: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/>',
+  documento: '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  bandeira: '<path d="M5 21V4h11l-2 4 2 4H5"/>',
 };
 function icone(nome) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -126,20 +133,22 @@ function sessaoCaiu(erro) {
   return true;
 }
 
-// ── Rotas: #/, #/ws/<slug> e #/ws/<slug>/links ─────────
+// ── Rotas: #/, #/ws/<slug>, #/ws/<slug>/links e #/ws/<slug>/linha ──
 window.addEventListener('hashchange', rotear);
 let carregando = 0;
 
 async function rotear() {
-  const ws = location.hash.match(/^#\/ws\/([a-z0-9-]+)(?:\/(links))?$/);
+  const ws = location.hash.match(/^#\/ws\/([a-z0-9-]+)(?:\/(links|linha))?$/);
   const minha = ++carregando;
   const conteudo = $('conteudo');
   conteudo.replaceChildren(el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }));
   try {
     if (ws) {
-      const dados = await api(`/api/workspaces/${ws[1]}`);
+      // A linha do tempo vem numa rota própria: ler todos os registros só quando a aba é aberta.
+      const [dados, linha] = await Promise.all([api(`/api/workspaces/${ws[1]}`),
+        ws[2] === 'linha' ? api(`/api/workspaces/${ws[1]}/linha-do-tempo`) : null]);
       if (minha !== carregando) return;
-      desenharWorkspace(dados, ws[2] || 'geral');
+      desenharWorkspace(dados, ws[2] || 'geral', linha);
     } else {
       const dados = await api('/api/workspaces');
       if (minha !== carregando) return;
@@ -207,9 +216,11 @@ function cartaoWorkspace(w) {
 // ── Um workspace ──────────────────────────────────────
 let filtroPendencias = 'abertas';
 
-function desenharWorkspace(w, aba) {
-  trilha(w.nome, ...(aba === 'links' ? ['Links'] : []));
-  document.title = `${aba === 'links' ? 'Links · ' : ''}${w.nome} · Observabilidade`;
+const NOME_ABA = { links: 'Links', linha: 'Linha do tempo' };
+
+function desenharWorkspace(w, aba, linha) {
+  trilha(w.nome, ...(NOME_ABA[aba] ? [NOME_ABA[aba]] : []));
+  document.title = `${NOME_ABA[aba] ? `${NOME_ABA[aba]} · ` : ''}${w.nome} · Observabilidade`;
   const atalhos = w.links.filter((l) => l.destaque && l.url);
   $('conteudo').replaceChildren(
     el('div', { class: 'titulo-pagina' },
@@ -219,8 +230,9 @@ function desenharWorkspace(w, aba) {
       selo(w.estado)),
     el('nav', { class: 'abas', 'aria-label': 'Seções do projeto' },
       el('a', { href: `#/ws/${w.slug}`, 'aria-current': aba === 'geral' ? 'page' : null }, 'Visão geral'),
+      el('a', { href: `#/ws/${w.slug}/linha`, 'aria-current': aba === 'linha' ? 'page' : null }, 'Linha do tempo'),
       el('a', { href: `#/ws/${w.slug}/links`, 'aria-current': aba === 'links' ? 'page' : null }, `Links (${w.links.length})`)),
-    aba === 'links' ? painelLinks(w) : visaoGeral(w, atalhos),
+    aba === 'links' ? painelLinks(w) : aba === 'linha' ? painelLinhaDoTempo(w, linha) : visaoGeral(w, atalhos),
   );
 }
 
@@ -315,7 +327,7 @@ function painelPendencias(w) {
 
 function painelHistorico(w) {
   const itens = w.historico.dados;
-  return painel('Alterações', 'pasta historico/', avisoFonte(w.historico),
+  return painel('Alterações', el('a', { class: 'ver-mais', href: `#/ws/${w.slug}/linha` }, 'Linha do tempo →'), avisoFonte(w.historico),
     itens.length ? el('ul', { class: 'lista' }, itens.map((r) => el('li', { class: 'registro' },
       el('button', { type: 'button', onclick: () => abrirRegistro(w.slug, r) },
         el('strong', {}, r.titulo), el('small', {}, dataCurta(r.quando)))))) :
@@ -341,6 +353,196 @@ function tabelaCustos(custos, cotacaoData) {
     el('tbody', {}, linhas),
     el('tfoot', {}, el('tr', {}, el('td', {}, 'Total', cotacaoData ? el('small', {}, `Cotação de ${cotacaoData}`) : null),
       el('td', {}, reais(custos.total_mensal_brl)))));
+}
+
+// ── Aba Linha do tempo: a história do projeto em etapas ──
+// Cartões lado a lado, ligados por linhas. Quem divide as etapas é o servidor
+// (fontes.agrupar_em_etapas): cada marco abre uma etapa e as mudanças seguintes
+// ficam dentro dela — o número na bolinha. Tocar numa etapa mostra as mudanças
+// embaixo; a última, tracejada, são as pendências abertas ("Próximos").
+const TIPOS = {
+  funcao: 'Função nova', melhoria: 'Melhoria', correcao: 'Correção', seguranca: 'Segurança',
+  infraestrutura: 'Infraestrutura', documentacao: 'Documentação', outro: 'Outro', sem: 'Sem tipo',
+};
+const ICONE_DO_TIPO = { funcao: 'estrela', melhoria: 'subir', correcao: 'ferramenta', seguranca: 'escudo',
+  infraestrutura: 'servidor', documentacao: 'documento', outro: 'caixa', sem: 'caixa' };
+const COR_COMECO = '#e9ecef';
+const CORES_ETAPA = ['#4cc9f0', '#f7c948', '#a78bfa', '#f472b6', '#4ade80', '#fb923c', '#38bdf8', '#e879f9'];
+const COR_PROXIMOS = '#9aa1ad';
+const escolhida = { slug: '', indice: -1 };
+
+const tiposDe = (p) => (p.tipos.length ? p.tipos : ['sem']);
+const diaDoRegistro = (q) => `${q.slice(8, 10)}/${q.slice(5, 7)}/${q.slice(0, 4)}`;
+const corDaEtapa = (i) => (i === 0 ? COR_COMECO : CORES_ETAPA[(i - 1) % CORES_ETAPA.length]);
+const rotuloDaEtapa = (i) => (i === 0 ? 'Começo' : `Etapa ${i}`);
+
+function periodo(pontos) {
+  const de = diaDoRegistro(pontos[0].quando);
+  const ate = diaDoRegistro(pontos[pontos.length - 1].quando);
+  return de === ate ? de : `${de} a ${ate}`;
+}
+
+function painelLinhaDoTempo(w, linha) {
+  const etapas = linha.etapas.dados;
+  const proximos = linha.proximos.dados;
+  if (!etapas.length) {
+    return el('div', {}, avisoFonte(linha.etapas), linha.etapas.erro ? null
+      : el('p', { class: 'vazio' }, 'Nenhum registro em historico/ ainda. Cada arquivo de lá entra numa etapa desta linha do tempo.'));
+  }
+  const pontos = etapas.flatMap((e) => e.pontos);
+  const conta = (teste) => pontos.filter(teste).length;
+  const semTipo = conta((p) => !p.tipos.length);
+  const temProximos = proximos.length > 0 || Boolean(linha.proximos.erro);
+  const total = etapas.length + (temProximos ? 1 : 0);
+  if (escolhida.slug !== w.slug || escolhida.indice < 0 || escolhida.indice >= total) {
+    escolhida.slug = w.slug;
+    escolhida.indice = etapas.length - 1; // abre na etapa atual
+  }
+
+  const nos = [];
+  const trilho = el('div', { class: 'trilho' });
+  etapas.forEach((etapa, i) => {
+    if (i > 0) trilho.append(el('span', { class: 'conector', '--cor-etapa': corDaEtapa(i), 'aria-hidden': 'true' }));
+    const no = el('button', { type: 'button', class: 'no-etapa', '--cor-etapa': corDaEtapa(i),
+      'aria-label': `${rotuloDaEtapa(i)}: ${etapa.nome}. ${etapa.pontos.length} ${etapa.pontos.length === 1 ? 'mudança' : 'mudanças'}, ${periodo(etapa.pontos)}`,
+      title: etapa.nome, onclick: () => escolher(i) },
+    el('span', { class: 'no-icone' }, icone(ICONE_DO_TIPO[etapa.tipo] || 'caixa')),
+    el('span', { class: 'no-textos' },
+      el('span', { class: 'no-rotulo' }, rotuloDaEtapa(i)),
+      el('strong', { class: 'no-titulo' }, etapa.nome)),
+    el('span', { class: 'no-contagem', 'aria-hidden': 'true' }, etapa.pontos.length));
+    nos.push(no);
+    trilho.append(no);
+  });
+  if (temProximos) {
+    trilho.append(el('span', { class: 'conector proximo', '--cor-etapa': COR_PROXIMOS, 'aria-hidden': 'true' }));
+    const no = el('button', { type: 'button', class: 'no-etapa proximo', '--cor-etapa': COR_PROXIMOS,
+      'aria-label': `Próximos: ${proximos.length} ${proximos.length === 1 ? 'pendência aberta' : 'pendências abertas'}`,
+      onclick: () => escolher(etapas.length) },
+    el('span', { class: 'no-icone' }, icone('bandeira')),
+    el('span', { class: 'no-textos' }, el('span', { class: 'no-rotulo' }, 'Próximos'), el('strong', { class: 'no-titulo' }, 'Pendências abertas')),
+    el('span', { class: 'no-contagem', 'aria-hidden': 'true' }, proximos.length));
+    nos.push(no);
+    trilho.append(no);
+  }
+
+  const palco = el('div', { class: 'palco', role: 'group', 'aria-label': 'Etapas do projeto' }, trilho);
+  const detalhe = el('div', { class: 'detalhe-area' });
+  arrastavel(palco);
+  palco.addEventListener('keydown', (e) => {
+    const passo = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+    if (!passo || !nos.includes(document.activeElement)) return;
+    e.preventDefault();
+    const i = Math.min(Math.max(escolhida.indice + passo, 0), nos.length - 1);
+    escolher(i);
+    nos[i].focus({ preventScroll: true });
+  });
+
+  function centralizar(i, suave) {
+    const no = nos[i];
+    const alvo = no.offsetLeft - (palco.clientWidth - no.offsetWidth) / 2;
+    palco.scrollTo({ left: Math.max(alvo, 0), behavior: suave && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+  }
+
+  function marcar(i) {
+    escolhida.indice = i;
+    nos.forEach((no, j) => { no.classList.toggle('escolhida', j === i); no.setAttribute('aria-pressed', String(j === i)); });
+    detalhe.replaceChildren(i < etapas.length ? detalheEtapa(w, etapas[i], i) : detalheProximos(linha.proximos));
+  }
+  function escolher(i) {
+    marcar(i);
+    centralizar(i, true);
+  }
+
+  marcar(escolhida.indice);
+  // Centraliza a etapa escolhida depois que o palco está na tela (precisa das medidas).
+  requestAnimationFrame(() => centralizar(escolhida.indice, false));
+
+  return el('div', {},
+    el('div', { class: 'metricas' },
+      metrica('Mudanças registradas', pontos.length, `desde ${diaDoRegistro(pontos[0].quando)}`),
+      metrica('Etapas', etapas.length, 'cada uma começa num marco'),
+      metrica('Correções', conta((p) => p.tipos.includes('correcao')), 'bugs que ganharam registro'),
+      metrica('Só no teste', conta((p) => p.na_producao === false), 'esperando ir para a produção')),
+    semTipo ? el('p', { class: 'aviso-fonte solto' }, `${semTipo} ${semTipo === 1 ? 'registro ainda não tem' : 'registros ainda não têm'} a linha "Tipo" no cabeçalho. O modelo está no historico/README.md do projeto.`) : null,
+    palco,
+    el('p', { class: 'dica-palco' }, 'Deslize ou arraste para o lado e toque numa etapa para ver as mudanças dela.'),
+    detalhe);
+}
+
+// Arrastar com o mouse para o lado, como na imagem de referência. No toque, o
+// próprio navegador já rola: o arraste só vale para o mouse.
+function arrastavel(palco) {
+  let inicio = null;
+  let arrastou = false;
+  palco.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    inicio = { x: e.clientX, rolagem: palco.scrollLeft, id: e.pointerId };
+    arrastou = false;
+  });
+  palco.addEventListener('pointermove', (e) => {
+    if (!inicio) return;
+    const dx = e.clientX - inicio.x;
+    if (!arrastou && Math.abs(dx) > 5) {
+      arrastou = true;
+      palco.classList.add('arrastando');
+      palco.setPointerCapture(inicio.id);
+    }
+    if (arrastou) palco.scrollLeft = inicio.rolagem - dx;
+  });
+  const soltar = () => { inicio = null; palco.classList.remove('arrastando'); };
+  palco.addEventListener('pointerup', soltar);
+  palco.addEventListener('pointercancel', soltar);
+  // Um arraste que termina em cima de um cartão não conta como toque nele.
+  palco.addEventListener('click', (e) => {
+    if (!arrastou) return;
+    arrastou = false;
+    e.stopPropagation();
+    e.preventDefault();
+  }, true);
+}
+
+function detalheEtapa(w, etapa, i) {
+  const marco = etapa.pontos.find((p) => p.arquivo === etapa.marco);
+  return el('section', { class: 'detalhe-etapa', '--cor-etapa': corDaEtapa(i) },
+    el('div', { class: 'detalhe-cabeca' },
+      el('span', { class: 'no-rotulo' }, `${rotuloDaEtapa(i)} · ${periodo(etapa.pontos)}`),
+      el('h2', {}, etapa.nome),
+      marco && marco.resumo ? el('p', { class: 'resumo-tempo' }, inline(marco.resumo)) : null),
+    el('ol', { class: 'mudancas' }, etapa.pontos.map((p) => linhaMudanca(w, p))));
+}
+
+function detalheProximos(bloco) {
+  return el('section', { class: 'detalhe-etapa', '--cor-etapa': COR_PROXIMOS },
+    el('div', { class: 'detalhe-cabeca' },
+      el('span', { class: 'no-rotulo' }, 'Próximos · BACKLOG.md'),
+      el('h2', {}, 'Pendências abertas'),
+      el('p', { class: 'resumo-tempo' }, 'O que ainda vai acontecer: primeiro o que já está em andamento, depois por prioridade.')),
+    avisoFonte(bloco),
+    el('ol', { class: 'mudancas' }, bloco.dados.map((p) => el('li', { class: 'mudanca' },
+      el('div', { class: 'meta-tempo' }, el('span', { class: 'codigo' }, p.codigo),
+        p.status.includes('andamento') ? el('span', { class: 'selo-mini andamento' }, 'em andamento') : null,
+        p.prioridade ? el('span', { class: `prioridade ${p.prioridade}` }, p.prioridade) : null),
+      el('strong', { class: 'titulo-pendencia' }, p.titulo),
+      p.descricao ? el('p', { class: 'resumo-tempo curto' }, inline(p.descricao)) : null))));
+}
+
+function linhaMudanca(w, p) {
+  const commits = p.commits.slice(0, 4);
+  return el('li', { class: `mudanca t-${tiposDe(p)[0]}` },
+    el('div', { class: 'meta-tempo' },
+      el('time', { datetime: p.quando }, diaDoRegistro(p.quando)),
+      tiposDe(p).map((t) => el('span', { class: `tipo t-${t}` }, TIPOS[t] || TIPOS.outro)),
+      p.impacto === 'alto' ? el('span', { class: 'selo-mini marco' }, 'Marco') : null,
+      p.versao ? el('span', { class: 'selo-mini versao' }, `v${p.versao.replace(/^v/i, '')}`) : null,
+      p.na_producao === null ? null : el('span', { class: `selo-mini ${p.na_producao ? 'producao' : 'teste'}`, title: p.publicado || null },
+        p.na_producao ? 'Na produção' : 'Só no teste')),
+    el('button', { type: 'button', class: 'titulo-tempo', onclick: () => abrirRegistro(w.slug, p) }, p.titulo),
+    p.resumo ? el('p', { class: 'resumo-tempo' }, inline(p.resumo)) : null,
+    el('div', { class: 'rodape-tempo' },
+      commits.length ? el('span', { class: 'commits-tempo' }, commits.map((c) => linkExterno(c.link, c.sha, 'mono')),
+        p.commits.length > commits.length ? el('span', { class: 'suave' }, `+${p.commits.length - commits.length}`) : null) : el('span'),
+      el('button', { type: 'button', class: 'ler-registro', onclick: () => abrirRegistro(w.slug, p) }, 'Ler o registro →')));
 }
 
 // ── Leitura de um registro do histórico ───────────────

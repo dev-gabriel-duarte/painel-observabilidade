@@ -54,7 +54,17 @@ Isto não é pendência.
 """
 REGISTRO = '# Pedidos pelo site\n\n- **Data:** 27/10\n\n## Contexto\nTexto.\n'
 chamadas = []
-cenario = {'site': 200, 'github': 'ok', 'lento': False, 'railway': 'SUCCESS'}
+cenario = {'site': 200, 'github': 'ok', 'lento': False, 'railway': 'SUCCESS', 'historico': 'simples'}
+# Registros para a linha do tempo (grupo 9): nome → (sha do arquivo no git, texto).
+REGISTROS_LINHA = {
+    '2026-06-04_2013_bot-no-ar.md': ('sha-bot', '# Bot no ar\n\n- **Commits:** `676e05c`\n'
+                                     '- **Publicado na produção?** Sim\n- **Tipo:** Função nova\n- **Impacto:** alto\n'
+                                     '- **Versão:** 2.0.0\n- **Resumo:** O cliente agenda pelo WhatsApp.\n- **Etapa:** O bot no ar\n\n## Contexto\nTexto.\n'),
+    '2026-11-17_1923_carros.md': ('sha-carros', '# Carros pelas medidas\n\n- **Branch:** `teste`\n- **Commits:** 91f846e\n'
+                                  '- **Publicado na produção?** Não. Fica no teste.\n- **Tipo:** melhoria\n- **Impacto:** médio\n\n'
+                                  '## Contexto\nOs carros não pareciam\nos de verdade.\n\nSegundo parágrafo.\n'),
+    '2026-10-31_0859_estresse.md': ('sha-estresse', '# Teste de estresse\n\n- **Tipo:** correção, segurança\n- **Impacto:** Alto.\n'),
+}
 
 
 def responder(request: httpx.Request) -> httpx.Response:
@@ -80,6 +90,11 @@ def responder(request: httpx.Request) -> httpx.Response:
                                               'commit': {'message': 'feat: algo\n\ncorpo', 'author': {'name': 'Gabriel', 'date': '2026-10-28T01:00:00Z'}}}])
         if 'BACKLOG.md' in url:
             return httpx.Response(200, text=BACKLOG)
+        if url.split('?')[0].endswith('/contents/historico') and cenario['historico'] == 'linha':
+            return httpx.Response(200, json=[{'name': 'README.md', 'sha': 'sha-readme'}]
+                                  + [{'name': nome, 'sha': sha} for nome, (sha, _) in REGISTROS_LINHA.items()])
+        if '/contents/historico/' in url and cenario['historico'] == 'linha':
+            return httpx.Response(200, text=REGISTROS_LINHA[url.split('/contents/historico/')[1].split('?')[0]][1])
         if url.split('?')[0].endswith('/contents/historico'):
             return httpx.Response(200, json=[{'name': 'README.md'}, {'name': '2026-10-27_2319_pedidos-lembretes.md'},
                                              {'name': '2026-10-28_2230_pasta-historico.md'}, {'name': 'rascunho.md'}])
@@ -346,12 +361,137 @@ def grupo_8_links():
               [l['nome'] for l in conferidos] == ['Perigo', 'Sem grupo'] and conferidos[0]['url'] is None
               and conferidos[1]['url'] == 'HTTPS://ok.com' and conferidos[1]['grupo'] == 'Links' and len(conferidos[1]['descricao']) == 400)
     js = (painel.PASTA_WEB / 'assets' / 'painel.js').read_text(encoding='utf-8')
-    registrar(g, 'tela: aba Links com rota própria (#/ws/<slug>/links)', '(?:\\/(links))?$' in js and 'function painelLinks' in js)
+    registrar(g, 'tela: aba Links com rota própria (#/ws/<slug>/links)', '(?:\\/(links|linha))?$' in js and 'function painelLinks' in js)
+
+
+# ── Grupo 9: linha do tempo (historico/ + BACKLOG.md) ──────────────
+def grupo_9_linha_do_tempo():
+    g = '9. Linha do tempo'
+    completo = (
+        '# Pedidos pelo site\n\n'
+        '- **Data do push:** 27/10/2026 às 23:19 (Brasília)\n'
+        '- **Branch:** `feature/x`, mesclado no `main` (produção)\n'
+        '- **Commits:** `c69c4b5`, `0beec3d` e o commit deste registro; acabada; c69c4b5 de novo\n'
+        '- **Publicado na produção?** Sim, em 31/10/2026, depois de validado no site de\n'
+        '  testes pelo Gabriel.\n'
+        '- **Tipo:** Função nova, Segurança e coisa inventada\n'
+        '- **Impacto:** Médio — muda o balcão\n'
+        '- **Resumo:** O cliente pede orçamento pelo `site`.\n'
+        '- **Versão:** `v3.4.0`\n\n'
+        '## Contexto\nNão é usado: o Resumo existe.\n')
+    r = fontes.ler_registro(completo, 'x.md', 'dono/repo')
+    registrar(g, 'lê o tipo sem ligar para acento e maiúscula, vários tipos, e o desconhecido vira "outro"',
+              r['tipos'] == ['funcao', 'seguranca', 'outro'])
+    registrar(g, 'impacto: só a primeira palavra conta (alto, médio ou baixo)', r['impacto'] == 'medio')
+    registrar(g, 'resumo e versão vêm do cabeçalho', r['resumo'] == 'O cliente pede orçamento pelo `site`.' and r['versao'] == 'v3.4.0')
+    registrar(g, 'valor que quebrou de linha é juntado', r['publicado'].endswith('site de testes pelo Gabriel.') and r['na_producao'] is True)
+    registrar(g, 'commits: sha com link montado no servidor, sem repetir, e palavra como "acabada" não vira commit',
+              [c['sha'] for c in r['commits']] == ['c69c4b5', '0beec3d']
+              and r['commits'][0]['link'] == 'https://github.com/dono/repo/commit/c69c4b5')
+    registrar(g, 'branch sem as crases do markdown', r['branch'] == 'feature/x, mesclado no main (produção)')
+
+    antigo = '# Registro antigo\n\n- **Publicado na produção?** Não — aguardando validar\n\n## Contexto\nPrimeira linha\ncontinua aqui.\n\nOutro parágrafo.\n'
+    a = fontes.ler_registro(antigo)
+    registrar(g, 'sem "Tipo" e sem "Impacto": fica vazio, nada é adivinhado', a['tipos'] == [] and a['impacto'] == '')
+    registrar(g, 'sem "Resumo": usa só o primeiro parágrafo do Contexto', a['resumo'] == 'Primeira linha continua aqui.')
+    registrar(g, '"Não" = só no teste; sem a linha = não se sabe',
+              a['na_producao'] is False and fontes.ler_registro('# X')['na_producao'] is None)
+    longo = fontes.ler_registro('- **Resumo:** ' + 'palavra ' * 100)
+    registrar(g, 'resumo comprido é cortado numa palavra inteira, com reticências',
+              len(longo['resumo']) <= 321 and longo['resumo'].endswith('palavra…'))
+    registrar(g, 'arquivo vazio ou sem cabeçalho não quebra', fontes.ler_registro('')['commits'] == []
+              and fontes.ler_registro(None)['tipos'] == [])
+
+    fontes._TEXTOS_POR_SHA.clear()
+    cenario['historico'] = 'linha'
+    try:
+        registrar(g, 'sem login: 401', novo().get('/api/workspaces/autopecas/linha-do-tempo').status_code == 401)
+        c = logado()
+        registrar(g, 'workspace inexistente: 404', c.get('/api/workspaces/nao-existe/linha-do-tempo').status_code == 404)
+        d = c.get('/api/workspaces/autopecas/linha-do-tempo').json()
+        etapas = d['etapas']['dados']
+        pontos = [p for e in etapas for p in e['pontos']]
+        registrar(g, 'todo registro entra, do mais antigo ao mais novo (README.md fica de fora)',
+                  [p['arquivo'] for p in pontos] == ['2026-06-04_2013_bot-no-ar.md', '2026-10-31_0859_estresse.md', '2026-11-17_1923_carros.md'])
+        registrar(g, 'cada marco abre uma etapa e a mudança seguinte fica dentro dela (o número da bolinha)',
+                  [(e['nome'], len(e['pontos'])) for e in etapas] == [('O bot no ar', 1), ('Teste de estresse', 2)])
+        registrar(g, 'nome da etapa: a linha "Etapa:" do marco; sem ela, o título do registro',
+                  etapas[0]['marco'] == '2026-06-04_2013_bot-no-ar.md' and etapas[1]['nome'] == 'Teste de estresse')
+        registrar(g, 'o ícone da etapa vem do tipo do marco', [e['tipo'] for e in etapas] == ['funcao', 'correcao'])
+        bot, estresse, carros = pontos
+        registrar(g, 'cada ponto traz data, título, tipo, impacto, versão e se está na produção',
+                  bot['quando'] == '2026-06-04T20:13' and bot['titulo'] == 'Bot no ar' and bot['tipos'] == ['funcao']
+                  and bot['impacto'] == 'alto' and bot['versao'] == '2.0.0' and bot['na_producao'] is True)
+        registrar(g, 'registro no teste aparece como "só no teste", com resumo do Contexto',
+                  carros['na_producao'] is False and carros['resumo'] == 'Os carros não pareciam os de verdade.')
+        registrar(g, 'correção com registro entra na linha do tempo', estresse['tipos'] == ['correcao', 'seguranca'] and estresse['impacto'] == 'alto')
+        proximos = d['proximos']['dados']
+        registrar(g, 'próximos passos: só pendências abertas, a "em andamento" primeiro',
+                  [p['codigo'] for p in proximos] == ['TEC 1', 'PEN 1'])
+
+        baixados = lambda: sum(1 for u in chamadas if '/contents/historico/' in u)
+        antes = baixados()
+        c.post('/api/atualizar')  # esquece o cache de 2 minutos
+        c.get('/api/workspaces/autopecas/linha-do-tempo')
+        registrar(g, 'registro que não mudou (mesmo sha) não é baixado de novo, nem com "Atualizar agora"', baixados() == antes)
+        nome = '2026-11-17_1923_carros.md'
+        REGISTROS_LINHA[nome] = ('sha-carros-v2', REGISTROS_LINHA[nome][1].replace('Não. Fica no teste.', 'Sim, em 20/11.'))
+        c.post('/api/atualizar')
+        d2 = c.get('/api/workspaces/autopecas/linha-do-tempo').json()
+        registrar(g, '...e o que mudou (sha novo) é baixado de novo, só ele',
+                  baixados() == antes + 1 and d2['etapas']['dados'][1]['pontos'][1]['na_producao'] is True)
+        c.post('/api/atualizar')
+        c.get('/api/workspaces/autopecas')
+        registrar(g, 'a Visão geral aproveita os mesmos textos (títulos sem novo download)', baixados() == antes + 1)
+
+        cenario['github'] = 'fora'
+        r = logado().get('/api/workspaces/autopecas/linha-do-tempo')
+        registrar(g, 'GitHub fora do ar: a aba abre e explica o motivo',
+                  r.status_code == 200 and 'não respondeu' in (r.json()['etapas']['erro'] or '') and r.json()['etapas']['dados'] == [])
+    finally:
+        cenario['github'] = 'ok'
+        cenario['historico'] = 'simples'
+        REGISTROS_LINHA['2026-11-17_1923_carros.md'] = ('sha-carros', REGISTROS_LINHA['2026-11-17_1923_carros.md'][1])
+
+    def ponto(arquivo, impacto='', etapa='', titulo='T'):
+        return {'arquivo': arquivo, 'quando': f'{arquivo[:10]}T{arquivo[11:13]}:{arquivo[13:15]}', 'impacto': impacto,
+                'etapa': etapa, 'titulo': titulo, 'tipos': []}
+    antes_do_marco = fontes.agrupar_em_etapas([ponto('2026-01-05_1000_a.md'), ponto('2026-02-01_1000_b.md', 'alto', 'Marco B'),
+                                               ponto('2026-02-03_1000_c.md', 'medio')])
+    registrar(g, 'mudança antes do primeiro marco forma a etapa do começo (nada se perde)',
+              [(e['nome'], e['marco'], len(e['pontos'])) for e in antes_do_marco] == [('T', '', 1), ('Marco B', '2026-02-01_1000_b.md', 2)])
+    por_mes = fontes.agrupar_em_etapas([ponto('2026-06-04_1000_a.md'), ponto('2026-06-20_1000_b.md'), ponto('2026-08-01_1000_c.md', 'baixo')])
+    registrar(g, 'projeto sem nenhum marco: uma etapa por mês, com o nome do mês',
+              [(e['nome'], len(e['pontos'])) for e in por_mes] == [('junho de 2026', 2), ('agosto de 2026', 1)])
+    registrar(g, 'sem registros: nenhuma etapa', fontes.agrupar_em_etapas([]) == [])
+    registrar(g, 'nome curto da etapa é lido do cabeçalho e cortado se for comprido',
+              fontes.ler_registro('- **Etapa:** Agenda com 3 boxes')['etapa'] == 'Agenda com 3 boxes'
+              and len(fontes.ler_registro('- **Etapa:** ' + 'nome ' * 30)['etapa']) <= 41)
+
+    sem_repo = painel.carregar_workspaces()['autopecas'] | {'repositorio': ''}
+    import asyncio
+    registrar(g, 'projeto sem repositório: linha do tempo vazia, sem erro', asyncio.run(painel._linha_do_tempo(sem_repo)) == [])
+
+    js = (painel.PASTA_WEB / 'assets' / 'painel.js').read_text(encoding='utf-8')
+    registrar(g, 'tela: aba "Linha do tempo" com rota própria (#/ws/<slug>/linha)',
+              "'Linha do tempo'" in js and '/linha-do-tempo' in js and 'function painelLinhaDoTempo' in js)
+    registrar(g, 'tela em etapas: cartões ligados por linhas, bolinha com a contagem e a etapa "Próximos"',
+              all(f"class: '{c}" in js for c in ('no-etapa', 'conector', 'no-contagem', 'no-rotulo'))
+              and "'Próximos'" in js and 'function detalheEtapa' in js)
+    registrar(g, 'arrastar para o lado só com o mouse (no toque, quem rola é o navegador) e arraste não vira clique',
+              "e.pointerType !== 'mouse'" in js and "addEventListener('click'" in js and 'stopPropagation' in js)
+    registrar(g, 'cor da etapa só de uma lista nossa (nada vindo do registro vira cor)',
+              "'--cor-etapa': corDaEtapa(i)" in js and 'CORES_ETAPA = [' in js and "chave.startsWith('--')" in js)
+    registrar(g, 'texto dos registros entra como texto: innerHTML só nos ícones escritos por nós',
+              js.count('innerHTML') == 1 and 'svg.innerHTML = ICONES' in js)
+    css = (painel.PASTA_WEB / 'assets' / 'painel.css').read_text(encoding='utf-8')
+    registrar(g, 'todo tipo que o servidor conhece tem cor e nome na tela',
+              all(f'.t-{t} ' in css and f"{t}: '" in js for t in set(fontes.TIPOS.values()) | {'outro', 'sem'}))
 
 
 if __name__ == '__main__':
     for grupo in (grupo_1_login, grupo_2_protecoes, grupo_3_pendencias, grupo_4_custos, grupo_5_dados,
-                  grupo_6_falhas, grupo_7_configuracao, grupo_8_links):
+                  grupo_6_falhas, grupo_7_configuracao, grupo_8_links, grupo_9_linha_do_tempo):
         try:
             grupo()
         except Exception as erro:  # um grupo quebrado aparece como falha, não esconde os outros

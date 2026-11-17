@@ -2,7 +2,10 @@
 
 - **Data do push:** 28/10/2026 às 19:49 (Brasília) — primeiro envio para o GitHub
 - **Branch:** `main`
-- **Publicado na produção?** Ainda não: falta criar o serviço no Railway e as variáveis.
+- **Publicado na produção?** Sim, no mesmo dia: os registros das 20:10 e das 20:12 já saíram publicados pelo Railway. No momento deste push ainda faltavam o serviço e as variáveis.
+- **Tipo:** função nova
+- **Impacto:** alto
+- **Resumo:** Nasce o painel: sistemas no ar, pendências, alterações e custos de cada projeto numa tela só, com login da equipe.
 
 ## Contexto
 

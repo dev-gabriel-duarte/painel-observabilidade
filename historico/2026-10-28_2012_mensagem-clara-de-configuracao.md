@@ -3,6 +3,9 @@
 - **Data do push:** 28/10/2026 às 20:12 (Brasília)
 - **Branch:** `main`
 - **Publicado na produção?** Sim (o Railway publica sozinho).
+- **Tipo:** melhoria
+- **Impacto:** baixo
+- **Resumo:** Quando falta ou está errada uma variável, o login explica o motivo em vez de só recusar.
 
 ## Contexto
 
