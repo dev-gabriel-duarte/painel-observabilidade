@@ -1,9 +1,9 @@
 # Aba "Linha do tempo" em etapas
 
 - **Data do push:** 17/11/2026 às 21:45 (Brasília)
-- **Branch:** `claude/keen-dijkstra-pc21w9` (ainda não está no `main`)
-- **Commits:** `5d583d5` e o commit deste registro
-- **Publicado na produção?** Não. O Railway só publica o `main`; a aba vai ao ar quando o Gabriel levar este branch para lá.
+- **Branch:** `main`, vindo de `claude/keen-dijkstra-pc21w9`
+- **Commits:** `5d583d5`, `91b4702` e o commit que atualizou este registro
+- **Publicado na produção?** Sim, em 17/11/2026, a pedido do Gabriel (o Railway publica sozinho a partir do `main`).
 - **Tipo:** função nova
 - **Impacto:** médio
 - **Resumo:** Cada projeto ganha a aba Linha do tempo: a história contada em etapas, cartões lado a lado ligados por linhas, e as pendências abertas no fim.
@@ -51,8 +51,11 @@ com um número. A aba foi refeita nesse formato antes do envio.
 
 - A aba lê o `historico/` do `main` de cada projeto. Na autopeças, os registros
   com Tipo, Impacto, Resumo e Etapa (e os 14 retroativos de junho a outubro)
-  ainda estão no branch de trabalho, aguardando a aprovação do Gabriel. Até lá,
-  a aba mostra os registros antigos, sem marcos: uma etapa por mês.
+  foram ao `main` no mesmo dia, logo antes desta publicação. Os retroativos foram
+  escritos a partir do `git log` e publicados sem revisão linha a linha: o que
+  estiver errado se corrige no próprio arquivo, e a aba atualiza sozinha.
+- O primeiro envio foi recusado (403): o app do Claude no GitHub não tinha acesso
+  a este repositório. O Gabriel liberou o acesso em 17/11.
 - O nome curto da etapa é cortado com reticências se for comprido demais.
 
 ## Como foi testado
